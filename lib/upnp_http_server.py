@@ -1,7 +1,26 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
+import netifaces as ni
+from lib.ups import check_ups
 
 PORT_NUMBER = 8080
+
+def get_network_interface_ip_address(interface='wlan0'):
+    """
+    Get the first IP address of a network interface.
+    :param interface: The name of the interface.
+    :return: The IP address.
+    """
+    while True:
+        if interface not in ni.interfaces():
+            logger.error('Could not find interface %s.' % (interface,))
+            exit(1)
+        interface = ni.ifaddresses(interface)
+        if (2 not in interface) or (len(interface[2]) == 0):
+            logger.warning('Could not find IP of interface %s. Sleeping.' % (interface,))
+            sleep(60)
+            continue
+        return interface[2][0]['addr']
 
 
 class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
@@ -12,13 +31,13 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
     # Handler for the GET requests
     def do_GET(self):
 
-        if self.path == '/boucherie_wsd.xml':
+        if self.path == '/ups_wsd.xml':
             self.send_response(200)
             self.send_header('Content-type', 'application/xml')
             self.end_headers()
             self.wfile.write(self.get_wsd_xml().encode())
             return
-        if self.path == '/jambon-3000.xml':
+        if self.path == '/ups.xml':
             self.send_response(200)
             self.send_header('Content-type', 'application/xml')
             self.end_headers()
@@ -31,17 +50,31 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Not found.")
             return
 
+    def do_SUBSCRIBE(self):
+        self.server.subscriptions += self.headers['CALLBACK']
+        self.send_response(200)
+        self.send_header('Content-type', 'application/xml')
+        self.end_headers()
+        self.wfile.write(self.get_attributes_xml().encode())
+
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/xml')
+        self.end_headers()
+        self.wfile.write(self.get_attributes_xml().encode())
+
     def get_device_xml(self):
         """
         Get the main device descriptor xml file.
         """
+        local_ip_address = get_network_interface_ip_address()
         xml = """<root>
     <specVersion>
         <major>1</major>
         <minor>0</minor>
     </specVersion>
     <device>
-        <deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>
+        <deviceType>urn:schemas-upnp-org:device:UPS:1</deviceType>
         <friendlyName>{friendly_name}</friendlyName>
         <manufacturer>{manufacturer}</manufacturer>
         <manufacturerURL>{manufacturer_url}</manufacturerURL>
@@ -53,12 +86,12 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
         <UDN>uuid:{uuid}</UDN>
         <serviceList>
             <service>
-                <URLBase>http://xxx.yyy.zzz.aaaa:5000</URLBase>
-                <serviceType>urn:boucherie.example.com:service:Jambon:1</serviceType>
-                <serviceId>urn:boucherie.example.com:serviceId:Jambon</serviceId>
-                <controlURL>/jambon</controlURL>
+                <URLBase>http://{ip}:8088</URLBase>
+                <serviceType>urn:ups.example.com:service:UPS:1</serviceType>
+                <serviceId>urn:ups.example.com:serviceId:UPS</serviceId>
+                <controlURL>/ups</controlURL>
                 <eventSubURL/>
-                <SCPDURL>/boucherie_wsd.xml</SCPDURL>
+                <SCPDURL>/ups_wsd.xml</SCPDURL>
             </service>
         </serviceList>
         <presentationURL>{presentation_url}</presentationURL>
@@ -73,7 +106,8 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
                           model_url=self.server.model_url,
                           serial_number=self.server.serial_number,
                           uuid=self.server.uuid,
-                          presentation_url=self.server.presentation_url)
+                          presentation_url=self.server.presentation_url,
+                          ip=local_ip_address)
 
     @staticmethod
     def get_wsd_xml():
@@ -86,6 +120,17 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
 <minor>0</minor>
 </specVersion>
 </scpd>"""
+    @staticmethod
+    def get_attributes_xml():
+        """
+        return the attributes for the ups
+        """
+        doc = "<root>\n"
+        for k,v in check_ups().items():
+            k = k.replace('.', '_')
+            doc += "<{}>{}</{}>\n".format(k,v,k)
+        doc += "</root>"
+        return doc
 
 
 class UPNPHTTPServerBase(HTTPServer):
@@ -104,6 +149,7 @@ class UPNPHTTPServerBase(HTTPServer):
         self.serial_number = None
         self.uuid = None
         self.presentation_url = None
+        self.subscriptions = []
 
 
 class UPNPHTTPServer(threading.Thread):

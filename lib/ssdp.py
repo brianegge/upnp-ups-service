@@ -145,6 +145,7 @@ class SSDPServer:
 
         # Do we know about this service?
         for i in self.known.values():
+            logger.info("Checking st %s" % i['ST'])
             if i['MANIFESTATION'] == 'remote':
                 continue
             if headers['st'] == 'ssdp:all' and i['SILENT']:
