@@ -21,3 +21,8 @@ User=pi
 [Install]
 WantedBy=multi-user.target
 ```
+
+Stuff you need:
+ * A UPS with a USB interface, such as [TrippLite](https://amzn.to/2F5V4aA)
+ * A Raspberry Pi or other linux based computer [Pi ZeroW](https://amzn.to/2qsbRdQ)
+ * Left Angled 90 Degree Micro USB OTG to Standard B [USB Cable](https://amzn.to/2qpZZcq)
