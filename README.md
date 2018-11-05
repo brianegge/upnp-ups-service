@@ -5,20 +5,23 @@
 This code implements a SSDP server and a HTTP server, in order to notify the network that a UPS is available for monitoring. This doesn't support subscription events just yet.
 
 First, install Python3:
-```sudo apt-get install python3```
+`sudo apt-get install python3`
 
 The in the project directory run
-```pip3 install -r requirements.txt```
+`pip3 install -r requirements.txt`
 
 Verify your ups is setup:
-```upsc myups 2> /dev/null
+
+```
+upsc myups 2> /dev/null
 battery.charge: 100
 battery.runtime: 3840
 battery.type: PbAC
-...```
+...
+```
 
 Test running the service:
-```./__main__.py```
+`./__main__.py`
 
 If that works, start as a service (and will start after reboot)
 Copy the following into /etc/systemd/system/upnp-ups.service, modify as needed
