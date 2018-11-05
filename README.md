@@ -22,6 +22,8 @@ User=pi
 WantedBy=multi-user.target
 ```
 
+This code expects your system has python3 available. You can install the dependencies with ```pip3 install -r requirements.txt```
+
 Stuff you need:
  * A UPS with a USB interface, such as [TrippLite](https://amzn.to/2F5V4aA)
  * A Raspberry Pi or other linux based computer [Pi ZeroW](https://amzn.to/2qsbRdQ)
