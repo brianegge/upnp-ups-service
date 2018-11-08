@@ -2,22 +2,29 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import netifaces as ni
 from lib.ups import check_ups
+import logging
 
 PORT_NUMBER = 8080
+# Change this based on the the output from /sbin/ifconfig
+DEFAULT_ETHERNET = 'wlan0'
+logger = logging.getLogger()
 
-def get_network_interface_ip_address(interface='wlan0'):
+def get_network_interface_ip_address(name=DEFAULT_ETHERNET):
     """
     Get the first IP address of a network interface.
     :param interface: The name of the interface.
     :return: The IP address.
     """
     while True:
-        if interface not in ni.interfaces():
-            logger.error('Could not find interface %s.' % (interface,))
+        if name not in ni.interfaces():
+            logger.error('Could not find interface %s.' % (name))
+            name = 'eth0'
+        if name not in ni.interfaces():
+            logger.error('Could not find interface %s.' % (name))
             exit(1)
-        interface = ni.ifaddresses(interface)
+        interface = ni.ifaddresses(name)
         if (2 not in interface) or (len(interface[2]) == 0):
-            logger.warning('Could not find IP of interface %s. Sleeping.' % (interface,))
+            logger.warning('Could not find IP of interface %s. Sleeping.' % (interface))
             sleep(60)
             continue
         return interface[2][0]['addr']

@@ -44,6 +44,7 @@ WantedBy=multi-user.target
 
 Run:
 ```sudo systemctl start upnp-ups.service```
+```sudo systemctl status upnp-ups.service```
 
 Follow instructions in the SmartThings device for installing: https://github.com/brianegge/SmartThings-UPS
 
