@@ -1,0 +1,32 @@
+battery.charge: 100
+battery.charge.low: 10
+battery.charge.warning: 50
+battery.runtime: 20100
+battery.runtime.low: 120
+battery.type: PbAc
+battery.voltage: 27.4
+battery.voltage.nominal: 24.0
+device.mfr: American Power Conversion
+device.model: Smart-UPS 1500
+device.serial: AS1234
+device.type: ups
+driver.name: usbhid-ups
+driver.parameter.pollfreq: 30
+driver.parameter.pollinterval: 2
+driver.parameter.port: auto
+driver.parameter.synchronous: no
+driver.version: 2.7.4
+driver.version.data: APC HID 0.96
+driver.version.internal: 0.41
+ups.beeper.status: disabled
+ups.delay.shutdown: 20
+ups.firmware: COM 02.1 / UPS.05.I
+ups.mfr: American Power Conversion
+ups.mfr.date: 201810
+ups.model: Smart-UPS 12345
+ups.productid: 0300
+ups.serial: AS112345
+ups.status: OL
+ups.timer.reboot: -1
+ups.timer.shutdown: -1
+ups.vendorid: 051d

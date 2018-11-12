@@ -1,0 +1,35 @@
+battery.charge: 100
+battery.runtime: 3840
+battery.type: PbAC
+battery.voltage: 26.3
+battery.voltage.nominal: 24.0
+device.mfr: Tripp Lite 
+device.model: Tripp Lite UPS 
+device.type: ups
+driver.name: usbhid-ups
+driver.parameter.pollfreq: 30
+driver.parameter.pollinterval: 2
+driver.parameter.port: auto
+driver.parameter.synchronous: no
+driver.version: 2.7.4
+driver.version.data: TrippLite HID 0.82
+driver.version.internal: 0.41
+input.frequency: 59.9
+input.voltage: 119.3
+input.voltage.nominal: 120
+output.frequency.nominal: 60
+output.voltage: 119.2
+output.voltage.nominal: 120
+ups.beeper.status: enabled
+ups.delay.shutdown: 20
+ups.load: 0
+ups.mfr: Tripp Lite 
+ups.model: Tripp Lite UPS 
+ups.power: 0.0
+ups.power.nominal: 1500
+ups.productid: 2012
+ups.status: OL
+ups.timer.reboot: 65535
+ups.timer.shutdown: 65535
+ups.vendorid: 09ae
+ups.watchdog.status: 0
