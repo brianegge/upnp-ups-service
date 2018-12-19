@@ -6,9 +6,11 @@ import uuid
 from time import sleep
 import logging
 from lib.ups import check_ups
+import sys
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+if sys.stdout.isatty():
+    logger.setLevel(logging.DEBUG)
 
 
 def setup_debugging():

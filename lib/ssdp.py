@@ -140,8 +140,8 @@ class SSDPServer:
 
         (host, port) = host_port
 
-        logger.info('Discovery request from (%s,%d) for %s' % (host, port, headers['st']))
-        logger.info('Discovery request for %s' % headers['st'])
+        logger.debug('Discovery request from (%s,%d) for %s' % (host, port, headers['st']))
+        logger.debug('Discovery request for %s' % headers['st'])
 
         # Do we know about this service?
         for i in self.known.values():
