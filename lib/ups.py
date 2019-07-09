@@ -13,7 +13,7 @@ def check_ups():
         result[name] = value.strip()
     return result
 
-subscribers = []
+subscribers = set()
 last_poll = {}
 
 class Poller():
@@ -26,7 +26,10 @@ class Poller():
               poll = check_ups()
               diff = {}
               for k,v in poll.items():
-                  if not k in last_poll or last_poll[k] != v:
+                  if not k in last_poll:
+                      diff[k] = v
+                  elif last_poll[k] != v:
+                      print("{} {}=>{}".format(k,last_poll[k],v))
                       diff[k] = v
               if len(diff) > 0:
                   doc = "<root>\n"
@@ -39,7 +42,7 @@ class Poller():
                   pprint(doc)
                   for s in subscribers:
                       print("Updating {}".format(s))
-                      r = requests.post(url = s, headers = headers, data = doc) 
+                      r = requests.request('NOTIFY', url = s, headers = headers, data = doc) 
                       print("Hub response: ")
                       pprint(r)
               last_poll = poll

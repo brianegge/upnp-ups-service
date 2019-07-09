@@ -59,8 +59,19 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             return
 
     def do_SUBSCRIBE(self):
-        pprint(self.headers)
-        lib.ups.subscribers.append(self.headers['CALLBACK'][1:-1])
+        print('upnp subscribe')
+        print(self.headers)
+        lib.ups.subscribers.add(self.headers['CALLBACK'][1:-1])
+        lib.ups.last_poll = {}
+        self.send_response(200)
+        self.send_header('Content-type', 'application/xml')
+        self.end_headers()
+        self.wfile.write(self.get_attributes_xml().encode())
+
+    def do_UNSUBSCRIBE(self):
+        print('upnp unsubscribe')
+        print(self.headers)
+        lib.ups.subscribers.remove(self.headers['CALLBACK'][1:-1])
         self.send_response(200)
         self.send_header('Content-type', 'application/xml')
         self.end_headers()
