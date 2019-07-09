@@ -2,7 +2,9 @@ import subprocess
 import re
 from time import sleep
 import requests
-from pprint import pprint
+import logging
+
+logger = logging.getLogger()
 
 def check_ups():
     # output = subprocess.check_output(["/bin/cat", "test/cyberpower-off.txt"])
@@ -20,7 +22,7 @@ class Poller():
 
     def run(self):
         global subscribers, last_poll
-        print("Starting poller")
+        logger.info("Starting poller")
         while True:
           if len(subscribers) > 0:
               poll = check_ups()
@@ -29,7 +31,7 @@ class Poller():
                   if not k in last_poll:
                       diff[k] = v
                   elif last_poll[k] != v:
-                      print("{} {}=>{}".format(k,last_poll[k],v))
+                      logger.info("{} {}=>{}".format(k,last_poll[k],v))
                       diff[k] = v
               if len(diff) > 0:
                   doc = "<root>\n"
@@ -38,13 +40,13 @@ class Poller():
                       doc += "<{}>{}</{}>\n".format(k,v,k)
                   doc += "</root>"
                   headers = {'Content-type': 'application/xml'}
-                  print("Publishing event: ")
-                  pprint(doc)
+                  logger.debug("Publishing event: ")
+                  logger.debug(doc)
                   for s in subscribers:
-                      print("Updating {}".format(s))
-                      r = requests.request('NOTIFY', url = s, headers = headers, data = doc) 
-                      print("Hub response: ")
-                      pprint(r)
+                      logger.debug("Updating {}".format(s))
+                      r = requests.request('NOTIFY', url = s, headers = headers, data = doc)
+                      logger.debug("Hub response: ")
+                      logger.debug(r)
               last_poll = poll
           sleep(2)
 

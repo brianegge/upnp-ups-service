@@ -3,7 +3,6 @@ import threading
 import netifaces as ni
 import lib.ups
 import logging
-from pprint import pprint
 
 PORT_NUMBER = 8080
 # Change this based on the the output from /sbin/ifconfig
@@ -59,8 +58,8 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             return
 
     def do_SUBSCRIBE(self):
-        print('upnp subscribe')
-        print(self.headers)
+        logger.info('upnp subscribe')
+        logger.debug(self.headers)
         lib.ups.subscribers.add(self.headers['CALLBACK'][1:-1])
         lib.ups.last_poll = {}
         self.send_response(200)
@@ -69,8 +68,8 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
         self.wfile.write(self.get_attributes_xml().encode())
 
     def do_UNSUBSCRIBE(self):
-        print('upnp unsubscribe')
-        print(self.headers)
+        logger.info('upnp unsubscribe')
+        logger.debug(self.headers)
         lib.ups.subscribers.remove(self.headers['CALLBACK'][1:-1])
         self.send_response(200)
         self.send_header('Content-type', 'application/xml')
