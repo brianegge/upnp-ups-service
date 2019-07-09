@@ -15,7 +15,7 @@ def check_ups():
         result[name] = value.strip()
     return result
 
-subscribers = set()
+subscribers = {}
 last_poll = {}
 
 class Poller():
@@ -42,9 +42,9 @@ class Poller():
                   headers = {'Content-type': 'application/xml'}
                   logger.debug("Publishing event: ")
                   logger.debug(doc)
-                  for s in subscribers:
-                      logger.debug("Updating {}".format(s))
-                      r = requests.request('NOTIFY', url = s, headers = headers, data = doc)
+                  for sid,url in subscribers.items():
+                      logger.debug("Updating {} at {}".format(sid, url))
+                      r = requests.request('NOTIFY', url = url, headers = headers, data = doc)
                       logger.debug("Hub response: ")
                       logger.debug(r)
               last_poll = poll

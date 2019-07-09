@@ -3,6 +3,7 @@ import threading
 import netifaces as ni
 import lib.ups
 import logging
+import uuid
 
 PORT_NUMBER = 8080
 # Change this based on the the output from /sbin/ifconfig
@@ -60,17 +61,23 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
     def do_SUBSCRIBE(self):
         logger.info('upnp subscribe')
         logger.debug(self.headers)
-        lib.ups.subscribers.add(self.headers['CALLBACK'][1:-1])
+        if 'SID' in self.headers:
+            sid = self.headers['SID']
+        else:
+            sid = uuid.uuid1()
+        lib.ups.subscribers[sid] = self.headers['CALLBACK'][1:-1]
         lib.ups.last_poll = {}
         self.send_response(200)
         self.send_header('Content-type', 'application/xml')
+        self.send_header('SID', sid)
         self.end_headers()
         self.wfile.write(self.get_attributes_xml().encode())
 
     def do_UNSUBSCRIBE(self):
         logger.info('upnp unsubscribe')
         logger.debug(self.headers)
-        lib.ups.subscribers.remove(self.headers['CALLBACK'][1:-1])
+        sid = self.headers['SID']
+        del lib.ups.subscribers[sid]
         self.send_response(200)
         self.send_header('Content-type', 'application/xml')
         self.end_headers()
