@@ -5,8 +5,9 @@ from lib.upnp_http_server import UPNPHTTPServer, get_network_interface_ip_addres
 import uuid
 from time import sleep
 import logging
-from lib.ups import check_ups
+from lib.ups import check_ups, Poller
 import sys
+from threading import Thread
 
 logger = logging.getLogger()
 if sys.stdout.isatty():
@@ -25,6 +26,10 @@ def setup_debugging():
 
 
 # setup_debugging()
+
+poller = Poller()
+thread = Thread(target = poller.run)
+thread.start()
 
 device_uuid = '60874e62-e7fb-4bb6-bfbd-f0625230e791' # uuid.uuid4()
 local_ip_address = get_network_interface_ip_address()

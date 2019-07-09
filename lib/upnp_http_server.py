@@ -1,8 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import netifaces as ni
-from lib.ups import check_ups
+import lib.ups
 import logging
+from pprint import pprint
 
 PORT_NUMBER = 8080
 # Change this based on the the output from /sbin/ifconfig
@@ -58,7 +59,8 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             return
 
     def do_SUBSCRIBE(self):
-        self.server.subscriptions += self.headers['CALLBACK']
+        pprint(self.headers)
+        lib.ups.subscribers.append(self.headers['CALLBACK'][1:-1])
         self.send_response(200)
         self.send_header('Content-type', 'application/xml')
         self.end_headers()
@@ -129,7 +131,7 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
         return the attributes for the ups
         """
         doc = "<root>\n"
-        for k,v in check_ups().items():
+        for k,v in lib.ups.check_ups().items():
             k = k.replace('.', '_')
             doc += "<{}>{}</{}>\n".format(k,v,k)
         doc += "</root>"
@@ -150,7 +152,6 @@ class UPNPHTTPServerBase(HTTPServer):
         self.serial_number = None
         self.uuid = None
         self.presentation_url = None
-        self.subscriptions = []
 
 
 class UPNPHTTPServer(threading.Thread):
